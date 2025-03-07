@@ -12,3 +12,11 @@ export const signUpRequestValidation = joi.object<{
     email: Joi.string().email().required(),
     password: Joi.string().required(),
 });
+
+export const loginRequestValidation = joi.object<{
+    email: string;
+    password: string;
+}>({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+});
