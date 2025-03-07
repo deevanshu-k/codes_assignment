@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
-import routes from "./routes";
+import router from "./routes";
 import bodyParser = require("body-parser");
 import { SOMETHING_WENT_WRONG } from "./utils/message.util";
 
@@ -13,7 +13,7 @@ const PORT = Number(process.env.PORT);
 
 app.use(bodyParser.json());
 
-app.use("/v1/api", routes);
+app.use("/v1/api", router);
 
 app.use("*", (err: any, req: Request, res: Response, next: NextFunction) => {
     if (err && err.code && err.message) {

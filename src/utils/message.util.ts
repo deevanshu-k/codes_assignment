@@ -9,3 +9,9 @@ export const SOMETHING_WENT_WRONG = "Something went wrong !";
 export const WRONG_EMAIL_OR_PASSWORD = "Wrong email or password !";
 
 export const LOGIN_SUCCESS = "Login success !";
+
+export const UNAUTHORIZED_REQUEST = "Unauthorized !";
+
+export const USER_NOT_FOUND = "User not found !";
+
+export const SUCCESS = "Success !"
