@@ -17,13 +17,14 @@ export const signUp = async (
     try {
         const { error, value } = signUpRequestValidation.validate(req.body);
         if (error) {
-            res.status(400).json({
+            next({
                 code: 400,
                 message: BAD_REQUEST,
+                info: error,
             });
             return;
         }
-        
+
         const { first_name, last_name, email, password } = value;
 
         // Ckeck if user already exist
@@ -33,7 +34,7 @@ export const signUp = async (
             },
         });
         if (user) {
-            res.status(400).json({
+            next({
                 code: 400,
                 message: USER_ALREADY_EXIST,
             });
@@ -60,10 +61,10 @@ export const signUp = async (
             message: USER_SIGNUP_SUCCESS,
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
+        next({
             code: 500,
             message: SOMETHING_WENT_WRONG,
+            info: error,
         });
     }
 };
