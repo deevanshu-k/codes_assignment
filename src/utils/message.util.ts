@@ -14,4 +14,7 @@ export const UNAUTHORIZED_REQUEST = "Unauthorized !";
 
 export const USER_NOT_FOUND = "User not found !";
 
-export const SUCCESS = "Success !"
+export const SUCCESS = "Success !";
+
+export const MAIL_SENT_FOR_PASSWORD_CHANGE =
+    "Check your mail, password change url is sent to your mail !";

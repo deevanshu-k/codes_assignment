@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import {
     BAD_REQUEST,
     LOGIN_SUCCESS,
+    MAIL_SENT_FOR_PASSWORD_CHANGE,
     SOMETHING_WENT_WRONG,
+    UNAUTHORIZED_REQUEST,
     USER_ALREADY_EXIST,
     USER_SIGNUP_SUCCESS,
     WRONG_EMAIL_OR_PASSWORD,
@@ -14,6 +16,8 @@ import {
     loginRequestValidation,
     signUpRequestValidation,
 } from "../validations/auth.validation";
+import { AuthenticatedRequest } from "../interfaces/request.interface";
+import { sendMail } from "../services/mail.service";
 
 export const signUp = async (
     req: Request,
@@ -108,7 +112,7 @@ export const login = async (
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             next({ code: 401, message: WRONG_EMAIL_OR_PASSWORD });
-            return
+            return;
         }
 
         // Generate token
@@ -134,5 +138,39 @@ export const login = async (
             message: SOMETHING_WENT_WRONG,
             info: error,
         });
+    }
+};
+
+export const forgotPassword = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        if (!req.user) {
+            next({ code: 401, message: UNAUTHORIZED_REQUEST });
+            return;
+        }
+
+        // Generate reset password token
+        const token = jwt.sign(
+            { id: req.user.id, email: req.user.email },
+            String(process.env.JWT_SECRET_FOR_PASSWORD_RESET),
+            { expiresIn: "5m" }
+        );
+
+        // Send mail
+        await sendMail(
+            req.user.email,
+            "Reset password",
+            `reset-password-url: http://${process.env.HOST}:${process.env.PORT}/updatepassword?token=${token}`
+        );
+
+        res.status(200).json({
+            code: 200,
+            message: MAIL_SENT_FOR_PASSWORD_CHANGE,
+        });
+    } catch (error) {
+        next({ code: 500, message: SOMETHING_WENT_WRONG });
     }
 };
