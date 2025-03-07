@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import router from "./routes";
 import bodyParser = require("body-parser");
 import { SOMETHING_WENT_WRONG } from "./utils/message.util";
+import path from "path";
 
 dotenv.config();
 const app = express();
@@ -13,7 +14,12 @@ const PORT = Number(process.env.PORT);
 
 app.use(bodyParser.json());
 
-app.use("/v1/api", router);
+// Set the template engine as pug
+app.set('view engine', 'ejs');
+// Set the views directory
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(router);
 
 app.use("*", (err: any, req: Request, res: Response, next: NextFunction) => {
     if (err && err.code && err.message) {

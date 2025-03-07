@@ -3,6 +3,8 @@ import {
     BAD_REQUEST,
     LOGIN_SUCCESS,
     MAIL_SENT_FOR_PASSWORD_CHANGE,
+    PASSWORD_UPDATED,
+    RESET_PASSWORD_URL_EXPIRED,
     SOMETHING_WENT_WRONG,
     UNAUTHORIZED_REQUEST,
     USER_ALREADY_EXIST,
@@ -172,5 +174,48 @@ export const forgotPassword = async (
         });
     } catch (error) {
         next({ code: 500, message: SOMETHING_WENT_WRONG });
+    }
+};
+
+export const resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { token, password } = req.query;
+
+        // Verify token
+        const decodedToken = jwt.verify(
+            String(token),
+            String(process.env.JWT_SECRET_FOR_PASSWORD_RESET)
+        ) as { id: number; email: string };
+
+        // Create password hash
+        const salt_rounds = 10;
+        const salt = await bcrypt.genSalt(salt_rounds);
+        const hashed_password = await bcrypt.hash(String(password), salt);
+
+        // Reset password
+        await db.user.update({
+            where: {
+                id: decodedToken.id,
+                email: decodedToken.email,
+            },
+            data: {
+                password_hash: hashed_password,
+            },
+        });
+
+        res.status(200).json({
+            code: 200,
+            message: PASSWORD_UPDATED,
+        });
+    } catch (error: any) {
+        if (error.name && error.name === "TokenExpiredError") {
+            next({ code: 500, message: RESET_PASSWORD_URL_EXPIRED });
+            return;
+        }
+        next({ code: 500, message: SOMETHING_WENT_WRONG, info: error });
     }
 };

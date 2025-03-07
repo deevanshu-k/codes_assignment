@@ -18,3 +18,7 @@ export const SUCCESS = "Success !";
 
 export const MAIL_SENT_FOR_PASSWORD_CHANGE =
     "Check your mail, password change url is sent to your mail !";
+
+export const PASSWORD_UPDATED = "Password updated successfully !";
+
+export const RESET_PASSWORD_URL_EXPIRED = "Reset password url expired!";
